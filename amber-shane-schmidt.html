@@ -946,16 +946,16 @@ const CATEGORIES = [
   { name: 'Fuel',            color: '#EF9F27', keywords: ['BP ','CALTEX','SHELL','AMPOL','7-ELEVEN','UNITED PETROL','LIBERTY OIL','OTR ','ON THE RUN','PUMA ENERGY'] },
   { name: 'Dining & Café',   color: '#f0a050', keywords: ['MCDONALD','HUNGRY JACKS','KFC','SUBWAY','DOMINO','PIZZA HUT','NANDOS','OPORTO','RED ROOSTER','GRILL\'D','GUZMAN','ZAMBRERO','SCHNITZ','CAFÉ','CAFE ','COFFEE','GLORIA JEAN','THE COFFEE','STARBUCKS','BOOST JUICE','CHATIME','FISHBOWL','CHATTIME','SUSHI','THAI ','CHINESE ','INDIAN ','ITALIAN ','KEBAB','BAKERY','BAKEHOUSE'] },
   { name: 'Pubs & Alcohol',  color: '#c084fc', keywords: ['BWS','DAN MURPHY','LIQUORLAND','VINTAGE CELLARS','FIRST CHOICE','HOTEL ','TAVERN','BAR ','PUB ','BREWERY','CELLAR','RSL ','FOOTBALL CLUB','LEAGUES CLUB','BOWLS CLUB','NIGHTCLUB','LANTERN'] },
-  { name: 'Utilities',       color: '#60a5fa', keywords: ['AGL ','ORIGIN ENERGY','SA POWER','SIMPLY ENERGY','RED ENERGY','POWERSHOP','MOMENTUM','CLICK ENERGY','ENERGY AUSTRALIA','LUMO','SA WATER','CITY WATER','COUNCIL RATES','SYDNEY WATER','YARRA VALLEY','URBAN UTILITIES','SYNERGY','ACTEW'] },
+  { name: 'Utilities',       color: '#60a5fa', keywords: ['AGL ','ORIGIN ENERGY','SA POWER','SIMPLY ENERGY','RED ENERGY','POWERSHOP','MOMENTUM','CLICK ENERGY','ENERGY AUSTRALIA','LUMO','SA WATER','CITY WATER','SYDNEY WATER','YARRA VALLEY','URBAN UTILITIES','SYNERGY','ACTEW'] },
   { name: 'Phone & Internet', color: '#38bdf8', keywords: ['TELSTRA','OPTUS','VODAFONE','AMAYSIM','BELONG','TPG','AUSSIE BB','AUSSIE BROADBAND','INTERNODE','IINET','SPINTEL','SUPERLOOP','BOOST MOBILE','CIRCLES','LEBARA'] },
   { name: 'Insurance',       color: '#a78bfa', keywords: ['NRMA','RAA ','RACQ','RACV','RAC ','ALLIANZ','SUNCORP','BUDGET DIRECT','YOUI','BUPA','MEDIBANK','HCF ','NIB ','HBF ','FRANK HEALTH','AHM ','QBE ','IAL ','AAMI ','REAL INSURANCE','AUSTRALIA POST INSURANCE'] },
   { name: 'Medical',         color: '#f472b6', keywords: ['CHEMIST','PHARMACY','PRICELINE','TERRY WHITE','AMCAL','BLOOMS THE','CHEMIST WAREHOUSE','DOCTOR','MEDICAL CENTRE','MEDICAL CENTER','GP ','DENTAL','DENTIST','OPTICAL','OPTOMETRIST','PHYSIOTHER','RADIOLOGY','PATHOLOGY','HOSPITAL','ALLIED HEALTH','BULK BILL'] },
   { name: 'Transport',       color: '#34d399', keywords: ['UBER ','DIDI ','OLA ','13CABS','SILVER SERVICE','METRO TICKETS','METROCARD','MYKI','OPAL ','TRANSLINK','TRANSPERTH','ADELAIDE METRO','PARKING','WILSON PARKING','SECURE PARKING','CAR WASH','AUTOBARN','REPCO','SUPERCHEAP','BRIDGESTONE','BEAUREPAIRES','JAX TYRES'] },
   { name: 'Shopping',        color: '#fb923c', keywords: ['KMART','TARGET','BIG W','MYER','DAVID JONES','HARVEY NORMAN','JB HI-FI','BUNNINGS','OFFICEWORKS','IKEA','REBEL SPORT','ANACONDA','SUPER RETAIL','COTTON ON','UNIQLO','ZARA','H&M','CITY BEACH','SURF DIVE','AMAZON','EBAY','ETSY'] },
-  { name: 'Subscriptions',   color: '#818cf8', keywords: ['NETFLIX','SPOTIFY','APPLE ','GOOGLE ','MICROSOFT','ADOBE','STAN ','BINGE ','FOXTEL','DISNEY','YOUTUBE','AMAZON PRIME','AUDIBLE','AMAZON WEB','AWS ','DROPBOX','CANVA','SEEK ','REALESTATE.COM','DOMAIN.COM'] },
+  { name: 'Subscriptions',   color: '#818cf8', keywords: ['NETFLIX','SPOTIFY','APPLE','GOOGLE ','MICROSOFT','ADOBE','STAN ','BINGE ','FOXTEL','DISNEY','YOUTUBE','AMAZON PRIME','AUDIBLE','AMAZON WEB','AWS ','DROPBOX','CANVA','SEEK ','REALESTATE.COM','DOMAIN.COM'] },
   { name: 'Education',       color: '#6ee7b7', keywords: ['TAFE','UNIVERSITY','UNI ','COLLEGE ','SCHOOL ','TUTORING','UDEMY','COURSERA','LYNDA','SKILLSHARE','TEXTBOOK','CAMPION'] },
   { name: 'Health & Fitness',color: '#86efac', keywords: ['GYM','FITNESS','PLANET FITNESS','ANYTIME FITNESS','SNAP FITNESS','GOODLIFE','JETTS','F45','CROSSFIT','YOGA','PILATES','SWIM CENTRE','AQUATIC','SPORTING','SPORT '] },
-  { name: 'Government & Tax',color: '#94a3b8', keywords: ['ATO ','AUSTRALIAN TAX','CENTRELINK','SERVICES AUSTRALIA','MEDICARE','DVA ','COUNCIL ','RATES ','LAND TAX','STAMP DUTY','COURT','VICROADS','SERVICE NSW','SERVICE SA','TMR '] },
+  { name: 'Government & Tax',color: '#94a3b8', keywords: ['ATO ','AUSTRALIAN TAX','CENTRELINK','SERVICES AUSTRALIA','MEDICARE','DVA ','COUNCIL RATES','COUNCIL ','RATES ','LAND TAX','STAMP DUTY','COURT','VICROADS','SERVICE NSW','SERVICE SA','TMR '] },
   { name: 'Transfer',        color: '#64748b', keywords: ['TRANSFER','TFER','BPAY','PAY ANYONE','DIRECT DEBIT','DIRECT CREDIT','PAYMENT TO','PAYMENT FROM','AUTO PAY'] },
   { name: 'Income',          color: '#4caf7d', keywords: ['SALARY','PAYROLL','WAGES','EMPLOYER','CENTRELINK PAYMENT','PENSION','SUPERANNUATION','DIVIDEND','INTEREST PAID','CREDIT INTEREST','TAX REFUND'] },
   { name: 'Other',           color: '#475569', keywords: [] },
@@ -1369,10 +1369,78 @@ document.getElementById('modalOverlay').addEventListener('click', function(e) {
 
 // ── EXPORT ────────────────────────────────────────────────────────────────────
 function exportCSV() {
-  const rows = [['Date','Description','Category','Debit','Credit']];
+  const rows = [];
+
+  // Header
+  rows.push(['AMBER Statement Analyser — Shane Schmidt']);
+  rows.push(['Exported: ' + new Date().toLocaleDateString('en-AU')]);
+  rows.push([]);
+
+  // Summary
+  const totalDebit  = transactions.reduce((s,t) => s + t.debit, 0);
+  const totalCredit = transactions.reduce((s,t) => s + t.credit, 0);
+  const net = totalCredit - totalDebit;
+  rows.push(['SUMMARY']);
+  rows.push(['Total Transactions', transactions.length]);
+  rows.push(['Total Spent', '$' + fmt(totalDebit)]);
+  rows.push(['Total Income / Credits', '$' + fmt(totalCredit)]);
+  rows.push(['Net', (net >= 0 ? '+' : '-') + '$' + fmt(Math.abs(net))]);
+  rows.push([]);
+
+  // Group by category
+  const grouped = {};
   transactions.forEach(t => {
-    rows.push([t.date, '"' + t.desc.replace(/"/g, '""') + '"', t.category, t.debit || '', t.credit || '']);
+    if (!grouped[t.category]) grouped[t.category] = [];
+    grouped[t.category].push(t);
   });
+
+  // Expenses first, sorted by total descending
+  const expCats = Object.keys(grouped)
+    .filter(cat => grouped[cat].some(t => t.debit > 0))
+    .sort((a,b) => {
+      const sumA = grouped[a].reduce((s,t) => s + t.debit, 0);
+      const sumB = grouped[b].reduce((s,t) => s + t.credit, 0);
+      return (grouped[b].reduce((s,t) => s + t.debit,0)) - (grouped[a].reduce((s,t) => s + t.debit,0));
+    });
+
+  rows.push(['EXPENSES BY CATEGORY']);
+  rows.push([]);
+
+  expCats.forEach(cat => {
+    const txns = grouped[cat].filter(t => t.debit > 0);
+    if (txns.length === 0) return;
+    const catTotal = txns.reduce((s,t) => s + t.debit, 0);
+
+    rows.push([cat.toUpperCase(), '', '', 'TOTAL: $' + fmt(catTotal)]);
+    rows.push(['Date', 'Description', 'Amount', '']);
+    txns.forEach(t => {
+      rows.push([t.date, '"' + t.desc.replace(/"/g,'""') + '"', '$' + fmt(t.debit), '']);
+    });
+    rows.push(['', '', 'Subtotal', '$' + fmt(catTotal)]);
+    rows.push([]);
+  });
+
+  // Credits / Income
+  const incCats = Object.keys(grouped)
+    .filter(cat => grouped[cat].some(t => t.credit > 0));
+
+  if (incCats.length > 0) {
+    rows.push(['INCOME & CREDITS']);
+    rows.push([]);
+    incCats.forEach(cat => {
+      const txns = grouped[cat].filter(t => t.credit > 0);
+      if (txns.length === 0) return;
+      const catTotal = txns.reduce((s,t) => s + t.credit, 0);
+      rows.push([cat.toUpperCase(), '', '', 'TOTAL: $' + fmt(catTotal)]);
+      rows.push(['Date', 'Description', 'Amount', '']);
+      txns.forEach(t => {
+        rows.push([t.date, '"' + t.desc.replace(/"/g,'""') + '"', '$' + fmt(t.credit), '']);
+      });
+      rows.push(['', '', 'Subtotal', '$' + fmt(catTotal)]);
+      rows.push([]);
+    });
+  }
+
   const csv = rows.map(r => r.join(',')).join('\n');
   const blob = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
