@@ -1368,12 +1368,14 @@ document.getElementById('modalOverlay').addEventListener('click', function(e) {
 });
 
 // ── EXPORT ────────────────────────────────────────────────────────────────────
+function fmtMoney(n) { return '$' + parseFloat(n).toFixed(2); }  // No thousands comma — avoids CSV column split
+
 function exportCSV() {
   const rows = [];
 
   // Header
-  rows.push(['AMBER Statement Analyser — Shane Schmidt']);
-  rows.push(['Exported: ' + new Date().toLocaleDateString('en-AU')]);
+  rows.push(['"AMBER Statement Analyser — Shane Schmidt"']);
+  rows.push(['"Exported: ' + new Date().toLocaleDateString('en-AU') + '"']);
   rows.push([]);
 
   // Summary
@@ -1382,9 +1384,9 @@ function exportCSV() {
   const net = totalCredit - totalDebit;
   rows.push(['SUMMARY']);
   rows.push(['Total Transactions', transactions.length]);
-  rows.push(['Total Spent', '$' + fmt(totalDebit)]);
-  rows.push(['Total Income / Credits', '$' + fmt(totalCredit)]);
-  rows.push(['Net', (net >= 0 ? '+' : '-') + '$' + fmt(Math.abs(net))]);
+  rows.push(['Total Spent', fmtMoney(totalDebit)]);
+  rows.push(['Total Income / Credits', fmtMoney(totalCredit)]);
+  rows.push(['Net', (net >= 0 ? '+' : '-') + fmtMoney(Math.abs(net))]);
   rows.push([]);
 
   // Group by category
@@ -1394,14 +1396,12 @@ function exportCSV() {
     grouped[t.category].push(t);
   });
 
-  // Expenses first, sorted by total descending
+  // Expenses sorted by total descending
   const expCats = Object.keys(grouped)
     .filter(cat => grouped[cat].some(t => t.debit > 0))
-    .sort((a,b) => {
-      const sumA = grouped[a].reduce((s,t) => s + t.debit, 0);
-      const sumB = grouped[b].reduce((s,t) => s + t.credit, 0);
-      return (grouped[b].reduce((s,t) => s + t.debit,0)) - (grouped[a].reduce((s,t) => s + t.debit,0));
-    });
+    .sort((a,b) =>
+      grouped[b].reduce((s,t) => s + t.debit, 0) - grouped[a].reduce((s,t) => s + t.debit, 0)
+    );
 
   rows.push(['EXPENSES BY CATEGORY']);
   rows.push([]);
@@ -1410,13 +1410,12 @@ function exportCSV() {
     const txns = grouped[cat].filter(t => t.debit > 0);
     if (txns.length === 0) return;
     const catTotal = txns.reduce((s,t) => s + t.debit, 0);
-
-    rows.push([cat.toUpperCase(), '', '', 'TOTAL: $' + fmt(catTotal)]);
+    rows.push([cat.toUpperCase(), '', 'TOTAL', fmtMoney(catTotal)]);
     rows.push(['Date', 'Description', 'Amount', '']);
     txns.forEach(t => {
-      rows.push([t.date, '"' + t.desc.replace(/"/g,'""') + '"', '$' + fmt(t.debit), '']);
+      rows.push([t.date, '"' + t.desc.replace(/"/g,'""') + '"', fmtMoney(t.debit), '']);
     });
-    rows.push(['', '', 'Subtotal', '$' + fmt(catTotal)]);
+    rows.push(['', '', 'Subtotal', fmtMoney(catTotal)]);
     rows.push([]);
   });
 
@@ -1431,12 +1430,12 @@ function exportCSV() {
       const txns = grouped[cat].filter(t => t.credit > 0);
       if (txns.length === 0) return;
       const catTotal = txns.reduce((s,t) => s + t.credit, 0);
-      rows.push([cat.toUpperCase(), '', '', 'TOTAL: $' + fmt(catTotal)]);
+      rows.push([cat.toUpperCase(), '', 'TOTAL', fmtMoney(catTotal)]);
       rows.push(['Date', 'Description', 'Amount', '']);
       txns.forEach(t => {
-        rows.push([t.date, '"' + t.desc.replace(/"/g,'""') + '"', '$' + fmt(t.credit), '']);
+        rows.push([t.date, '"' + t.desc.replace(/"/g,'""') + '"', fmtMoney(t.credit), '']);
       });
-      rows.push(['', '', 'Subtotal', '$' + fmt(catTotal)]);
+      rows.push(['', '', 'Subtotal', fmtMoney(catTotal)]);
       rows.push([]);
     });
   }
